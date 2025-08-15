@@ -9,8 +9,7 @@ import { AuthModal } from './components/AuthModal';
 
 // Dynamically set the API host to match the hostname used to access the app.
 // This works for both `localhost` and when accessing via a local network IP on a mobile device.
-const API_HOST = window.location.hostname || 'localhost';
-const API_BASE_URL = `http://${API_HOST}:3001`;
+const API_BASE_URL = '';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -22,7 +21,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/listings`);
+        const response = await fetch(`/api/listings`);
         if (response.ok) {
           const data: ProduceListing[] = await response.json();
           setListings(data);
@@ -42,7 +41,7 @@ const App: React.FC = () => {
   const handleAddListing = useCallback(async (newListingData: Omit<ProduceListing, 'id' | 'sellerName'>) => {
     if (user) {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/listings`, {
+        const response = await fetch(`/api/listings`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -66,7 +65,7 @@ const App: React.FC = () => {
 
   const handleLogin = useCallback(async (credentials: { email: string, password: string }) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        const response = await fetch(`/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(credentials),
@@ -87,7 +86,7 @@ const App: React.FC = () => {
 
   const handleRegister = useCallback(async (details: { fullName: string; email: string; password: string }) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+        const response = await fetch(`/api/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(details),
