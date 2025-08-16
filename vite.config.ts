@@ -2,41 +2,26 @@ import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
-<<<<<<< Current (Your changes)
     const env = loadEnv(mode, '.', '');
     return {
-      define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
-      },
-      resolve: {
-        alias: {
-          '@': path.resolve(__dirname, '.'),
-        }
-      }
+        define: {
+            'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+            'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+        },
+        resolve: {
+            alias: {
+                '@': path.resolve(__dirname, '.'),
+            }
+        },
+        server: {
+            host: true,
+            port: 5173,
+            proxy: {
+                '/api': {
+                    target: 'http://localhost:3001',
+                    changeOrigin: true,
+                },
+            },
+        },
     };
-=======
-	const env = loadEnv(mode, '.', '');
-	return {
-		define: {
-			'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-			'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
-		},
-		resolve: {
-			alias: {
-				'@': path.resolve(__dirname, '.'),
-			}
-		},
-		server: {
-			host: true,
-			port: 5173,
-			proxy: {
-				'/api': {
-					target: 'http://localhost:3001',
-					changeOrigin: true,
-				},
-			},
-		},
-	};
->>>>>>> Incoming (Background Agent changes)
 });
