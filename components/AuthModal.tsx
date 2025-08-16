@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
+import type { UserRole } from '../types';
 import { XIcon } from './icons/XIcon';
+import { RoleSelection } from './RoleSelection';
 
 interface AuthModalProps {
     mode: 'login' | 'register';
     onClose: () => void;
     onLogin: (credentials: { email: string; password: string }) => void;
-    onRegister: (details: { fullName: string; email: string; password: string }) => void;
+    onRegister: (details: { 
+        fullName: string; 
+        email: string; 
+        password: string;
+        role: UserRole;
+        phone?: string;
+        location?: string;
+    }) => void;
     onSwitchMode: () => void;
 }
 
@@ -13,6 +22,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ mode, onClose, onLogin, on
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [role, setRole] = useState<UserRole | null>(null);
+    const [phone, setPhone] = useState('');
+    const [location, setLocation] = useState('');
     const isLogin = mode === 'login';
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -20,13 +32,38 @@ export const AuthModal: React.FC<AuthModalProps> = ({ mode, onClose, onLogin, on
         if (isLogin) {
             onLogin({ email, password });
         } else {
-            onRegister({ fullName, email, password });
+            if (!role) {
+                alert('Please select your role.');
+                return;
+            }
+            onRegister({ 
+                fullName, 
+                email, 
+                password, 
+                role,
+                phone: phone || undefined,
+                location: location || undefined
+            });
         }
+    };
+
+    const resetForm = () => {
+        setFullName('');
+        setEmail('');
+        setPassword('');
+        setRole(null);
+        setPhone('');
+        setLocation('');
+    };
+
+    const handleSwitchMode = () => {
+        resetForm();
+        onSwitchMode();
     };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 z-40 flex items-center justify-center p-4" aria-modal="true" role="dialog">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md transform transition-all animate-fade-in-up">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg transform transition-all animate-fade-in-up max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between p-6 border-b border-slate-200">
                     <h2 className="text-2xl font-bold text-slate-800">{isLogin ? 'Login to AgriLink' : 'Create Account'}</h2>
                     <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
@@ -36,22 +73,54 @@ export const AuthModal: React.FC<AuthModalProps> = ({ mode, onClose, onLogin, on
                 <div className="p-8">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {!isLogin && (
-                            <div>
-                                <label htmlFor="fullName" className="block text-sm font-medium text-slate-700">Full Name</label>
-                                <input
-                                    id="fullName"
-                                    name="fullName"
-                                    type="text"
-                                    required
-                                    value={fullName}
-                                    onChange={(e) => setFullName(e.target.value)}
-                                    className="mt-1 block w-full px-4 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
-                                    placeholder="Jomo Kenyatta"
-                                />
-                            </div>
+                            <>
+                                <div>
+                                    <label htmlFor="fullName" className="block text-sm font-medium text-slate-700">Full Name *</label>
+                                    <input
+                                        id="fullName"
+                                        name="fullName"
+                                        type="text"
+                                        required
+                                        value={fullName}
+                                        onChange={(e) => setFullName(e.target.value)}
+                                        className="mt-1 block w-full px-4 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                                        placeholder="Jomo Kenyatta"
+                                    />
+                                </div>
+                                
+                                <RoleSelection selectedRole={role} onRoleChange={setRole} />
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label htmlFor="phone" className="block text-sm font-medium text-slate-700">Phone Number</label>
+                                        <input
+                                            id="phone"
+                                            name="phone"
+                                            type="tel"
+                                            value={phone}
+                                            onChange={(e) => setPhone(e.target.value)}
+                                            className="mt-1 block w-full px-4 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                                            placeholder="+254 700 123 456"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="location" className="block text-sm font-medium text-slate-700">Location</label>
+                                        <input
+                                            id="location"
+                                            name="location"
+                                            type="text"
+                                            value={location}
+                                            onChange={(e) => setLocation(e.target.value)}
+                                            className="mt-1 block w-full px-4 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"
+                                            placeholder="Nakuru County, Kenya"
+                                        />
+                                    </div>
+                                </div>
+                            </>
                         )}
+                        
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-slate-700">Email Address</label>
+                            <label htmlFor="email" className="block text-sm font-medium text-slate-700">Email Address *</label>
                             <input
                                 id="email"
                                 name="email"
@@ -65,7 +134,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ mode, onClose, onLogin, on
                             />
                         </div>
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-slate-700">Password</label>
+                            <label htmlFor="password" className="block text-sm font-medium text-slate-700">Password *</label>
                             <input
                                 id="password"
                                 name="password"
@@ -97,7 +166,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ mode, onClose, onLogin, on
                     <div className="mt-6 text-center">
                         <p className="text-sm text-slate-600">
                             {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
-                            <button onClick={onSwitchMode} className="font-medium text-emerald-600 hover:underline">
+                            <button onClick={handleSwitchMode} className="font-medium text-emerald-600 hover:underline">
                                 {isLogin ? 'Register' : 'Login'}
                             </button>
                         </p>

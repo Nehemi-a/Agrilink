@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import type { ProduceData } from '../types';
 import { SparklesIcon } from './icons/SparklesIcon';
+import { ImageUpload } from './ImageUpload';
+import { ContactDetailsForm } from './ContactDetailsForm';
 
 interface ProduceFormProps {
   onSubmit: (data: ProduceData) => void;
@@ -13,6 +15,13 @@ export const ProduceForm: React.FC<ProduceFormProps> = ({ onSubmit, isLoading })
     quantity: '100 kg',
     quality: 'Grade 1',
     location: 'Nakuru County, Kenya',
+    images: [],
+    contactDetails: {
+      fullName: '',
+      phone: '',
+      email: '',
+      whatsapp: '',
+    },
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -20,67 +29,103 @@ export const ProduceForm: React.FC<ProduceFormProps> = ({ onSubmit, isLoading })
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleImagesChange = (images: File[]) => {
+    setFormData(prev => ({ ...prev, images }));
+  };
+
+  const handleContactDetailsChange = (contactDetails: ProduceData['contactDetails']) => {
+    setFormData(prev => ({ ...prev, contactDetails }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required contact fields
+    if (!formData.contactDetails.fullName || !formData.contactDetails.phone) {
+      alert('Please fill in your full name and phone number.');
+      return;
+    }
+    
     onSubmit(formData);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label htmlFor="cropType" className="block text-sm font-medium text-slate-700 mb-1">Crop Type</label>
-          <input
-            type="text"
-            id="cropType"
-            name="cropType"
-            value={formData.cropType}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 ease-in-out"
-            placeholder="e.g., Maize, Beans, Tea"
-          />
-        </div>
-        <div>
-          <label htmlFor="quantity" className="block text-sm font-medium text-slate-700 mb-1">Quantity</label>
-          <input
-            type="text"
-            id="quantity"
-            name="quantity"
-            value={formData.quantity}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 ease-in-out"
-            placeholder="e.g., 500 kg, 10 tons"
-          />
-        </div>
-        <div>
-          <label htmlFor="quality" className="block text-sm font-medium text-slate-700 mb-1">Quality</label>
-          <input
-            type="text"
-            id="quality"
-            name="quality"
-            value={formData.quality}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 ease-in-out"
-            placeholder="e.g., Grade 1, Organic"
-          />
-        </div>
-        <div>
-          <label htmlFor="location" className="block text-sm font-medium text-slate-700 mb-1">Farm Location</label>
-          <input
-            type="text"
-            id="location"
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 ease-in-out"
-            placeholder="e.g., Nakuru County, Kenya"
-          />
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {/* Produce Details Section */}
+      <div className="space-y-6">
+        <h3 className="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-2">
+          Produce Details
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label htmlFor="cropType" className="block text-sm font-medium text-slate-700 mb-1">Crop Type</label>
+            <input
+              type="text"
+              id="cropType"
+              name="cropType"
+              value={formData.cropType}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 ease-in-out"
+              placeholder="e.g., Maize, Beans, Tea"
+            />
+          </div>
+          <div>
+            <label htmlFor="quantity" className="block text-sm font-medium text-slate-700 mb-1">Quantity</label>
+            <input
+              type="text"
+              id="quantity"
+              name="quantity"
+              value={formData.quantity}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 ease-in-out"
+              placeholder="e.g., 500 kg, 10 tons"
+            />
+          </div>
+          <div>
+            <label htmlFor="quality" className="block text-sm font-medium text-slate-700 mb-1">Quality</label>
+            <input
+              type="text"
+              id="quality"
+              name="quality"
+              value={formData.quality}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 ease-in-out"
+              placeholder="e.g., Grade 1, Organic"
+            />
+          </div>
+          <div>
+            <label htmlFor="location" className="block text-sm font-medium text-slate-700 mb-1">Farm Location</label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 ease-in-out"
+              placeholder="e.g., Nakuru County, Kenya"
+            />
+          </div>
         </div>
       </div>
+
+      {/* Image Upload Section */}
+      <ImageUpload
+        images={formData.images || []}
+        onImagesChange={handleImagesChange}
+        maxImages={5}
+      />
+
+      {/* Contact Details Section */}
+      <ContactDetailsForm
+        contactDetails={formData.contactDetails}
+        onContactDetailsChange={handleContactDetailsChange}
+      />
+
       <div className="flex justify-end">
         <button
           type="submit"

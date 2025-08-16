@@ -4,6 +4,8 @@ import { AnalysisDisplay } from './AnalysisDisplay';
 import { LoadingSpinner } from './LoadingSpinner';
 import { SparklesIcon } from './icons/SparklesIcon';
 import { XIcon } from './icons/XIcon';
+import { ImageUpload } from './ImageUpload';
+import { ContactDetailsForm } from './ContactDetailsForm';
 
 interface AddListingModalProps {
   onClose: () => void;
@@ -17,6 +19,13 @@ export const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd
     quantity: '100 kg',
     quality: 'Grade 1',
     location: 'Nakuru County, Kenya',
+    images: [],
+    contactDetails: {
+      fullName: '',
+      phone: '',
+      email: '',
+      whatsapp: '',
+    },
   });
   const [price, setPrice] = useState('');
   
@@ -31,9 +40,23 @@ export const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd
   
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPrice(e.target.value);
-  }
+  };
+
+  const handleImagesChange = (images: File[]) => {
+    setFormData(prev => ({ ...prev, images }));
+  };
+
+  const handleContactDetailsChange = (contactDetails: ProduceData['contactDetails']) => {
+    setFormData(prev => ({ ...prev, contactDetails }));
+  };
 
   const handleGetAnalysis = async () => {
+    // Validate required fields before analysis
+    if (!formData.contactDetails.fullName || !formData.contactDetails.phone) {
+      alert('Please fill in your full name and phone number before getting market analysis.');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setAnalysis(null);
@@ -52,16 +75,28 @@ export const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
     if (!price) {
         alert("Please enter a price for your listing.");
         return;
     }
-    onAddListing({ ...formData, pricePerUnit: price });
+    
+    if (!formData.contactDetails.fullName || !formData.contactDetails.phone) {
+        alert("Please fill in your full name and phone number.");
+        return;
+    }
+    
+    onAddListing({ 
+      ...formData, 
+      pricePerUnit: price,
+      images: formData.images?.map(file => file.name) || [], // Convert File objects to filenames for now
+    });
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-30 flex items-center justify-center p-4" aria-modal="true" role="dialog">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col transform transition-all animate-fade-in-up">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col transform transition-all animate-fade-in-up">
         <div className="flex items-center justify-between p-6 border-b border-slate-200">
           <h2 className="text-2xl font-bold text-slate-800">Create a New Listing</h2>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
@@ -69,24 +104,45 @@ export const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd
           </button>
         </div>
         <div className="p-6 overflow-y-auto">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Object.entries({cropType: 'Crop Type', quantity: 'Quantity', quality: 'Quality', location: 'Farm Location'}).map(([key, label]) => (
-                <div key={key}>
-                  <label htmlFor={key} className="block text-sm font-medium text-slate-700 mb-1">{label}</label>
-                  <input
-                    type="text"
-                    id={key}
-                    name={key}
-                    value={formData[key as keyof ProduceData]}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
-                  />
-                </div>
-              ))}
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Produce Details Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-2">
+                Produce Details
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries({cropType: 'Crop Type', quantity: 'Quantity', quality: 'Quality', location: 'Farm Location'}).map(([key, label]) => (
+                  <div key={key}>
+                    <label htmlFor={key} className="block text-sm font-medium text-slate-700 mb-1">{label}</label>
+                    <input
+                      type="text"
+                      id={key}
+                      name={key}
+                      value={formData[key as keyof ProduceData]}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
 
+            {/* Image Upload Section */}
+            <ImageUpload
+              images={formData.images || []}
+              onImagesChange={handleImagesChange}
+              maxImages={5}
+            />
+
+            {/* Contact Details Section */}
+            <ContactDetailsForm
+              contactDetails={formData.contactDetails}
+              onContactDetailsChange={handleContactDetailsChange}
+            />
+
+            {/* Price Section */}
             <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-200">
               <h3 className="font-semibold text-emerald-800 mb-2">Set Your Price</h3>
               <div className="flex flex-col sm:flex-row gap-4 items-center">

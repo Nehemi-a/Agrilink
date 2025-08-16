@@ -2,6 +2,7 @@ import React from 'react';
 import type { User } from '../types';
 import { LogoutIcon } from './icons/LogoutIcon';
 import { PlusCircleIcon } from './icons/PlusCircleIcon';
+import { UserCircleIcon } from './icons/UserCircleIcon';
 
 interface HeaderProps {
   user: User | null;
@@ -9,9 +10,35 @@ interface HeaderProps {
   onSellProduceClick: () => void;
   onLoginClick: () => void;
   onRegisterClick: () => void;
+  onProfileClick: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ user, onLogout, onSellProduceClick, onLoginClick, onRegisterClick }) => {
+export const Header: React.FC<HeaderProps> = ({ 
+  user, 
+  onLogout, 
+  onSellProduceClick, 
+  onLoginClick, 
+  onRegisterClick,
+  onProfileClick 
+}) => {
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case 'seller': return '🌾 Seller';
+      case 'buyer': return '🛒 Buyer';
+      case 'logistics': return '🚚 Logistics';
+      default: return role;
+    }
+  };
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case 'seller': return 'text-emerald-600';
+      case 'buyer': return 'text-blue-600';
+      case 'logistics': return 'text-orange-600';
+      default: return 'text-slate-600';
+    }
+  };
+
   return (
     <header className="bg-white shadow-sm sticky top-0 z-20">
       <div className="container mx-auto px-4 py-4 max-w-7xl">
@@ -26,17 +53,32 @@ export const Header: React.FC<HeaderProps> = ({ user, onLogout, onSellProduceCli
           </div>
           {user ? (
             <div className="flex items-center space-x-4">
-               <button
-                onClick={onSellProduceClick}
-                className="flex items-center space-x-2 text-sm font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 px-4 py-2 transition-all"
-                aria-label="Sell Produce"
-              >
-                <PlusCircleIcon className="h-5 w-5" />
-                <span className="hidden sm:block">Sell Produce</span>
-              </button>
+               {user.role === 'seller' && (
+                <button
+                  onClick={onSellProduceClick}
+                  className="flex items-center space-x-2 text-sm font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 px-4 py-2 transition-all"
+                  aria-label="Sell Produce"
+                >
+                  <PlusCircleIcon className="h-5 w-5" />
+                  <span className="hidden sm:block">Sell Produce</span>
+                </button>
+              )}
               <div className="hidden sm:flex items-center space-x-4">
                 <span className="text-sm text-slate-600">|</span>
-                <span className="text-sm text-slate-600">Welcome, {user.fullName.split(' ')[0]}</span>
+                <div className="flex flex-col items-end">
+                  <span className="text-sm text-slate-600">Welcome, {user.fullName.split(' ')[0]}</span>
+                  <span className={`text-xs font-medium ${getRoleColor(user.role)}`}>
+                    {getRoleLabel(user.role)}
+                  </span>
+                </div>
+                <button
+                  onClick={onProfileClick}
+                  className="flex items-center space-x-2 text-sm text-slate-500 hover:text-emerald-600 transition-colors"
+                  aria-label="View Profile"
+                >
+                  <UserCircleIcon className="h-5 w-5" />
+                  <span className="hidden md:block">Profile</span>
+                </button>
                 <button
                   onClick={onLogout}
                   className="flex items-center space-x-2 text-sm text-slate-500 hover:text-red-600 transition-colors"

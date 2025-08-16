@@ -1,28 +1,29 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
-import type { User, ProduceListing } from './types';
+import type { User, ProduceListing, UserRole } from './types';
 import { getMarketAnalysis } from './services/geminiService';
 import { Header } from './components/Header';
 import { Marketplace } from './components/Marketplace';
 import { AddListingModal } from './components/AddListingModal';
 import { AuthModal } from './components/AuthModal';
+import { UserProfile } from './components/UserProfile';
 
 // Dynamically set the API host to match the hostname used to access the app.
 // This works for both `localhost` and when accessing via a local network IP on a mobile device.
-const API_HOST = window.location.hostname || 'localhost';
-const API_BASE_URL = `http://${API_HOST}:3001`;
+const API_BASE_URL = '';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [listings, setListings] = useState<ProduceListing[]>([]);
   const [isAddingListing, setIsAddingListing] = useState<boolean>(false);
   const [authModal, setAuthModal] = useState<'login' | 'register' | null>(null);
+  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/listings`);
+        const response = await fetch(`/api/listings`);
         if (response.ok) {
           const data: ProduceListing[] = await response.json();
           setListings(data);
@@ -42,7 +43,7 @@ const App: React.FC = () => {
   const handleAddListing = useCallback(async (newListingData: Omit<ProduceListing, 'id' | 'sellerName'>) => {
     if (user) {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/listings`, {
+        const response = await fetch(`/api/listings`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -66,7 +67,7 @@ const App: React.FC = () => {
 
   const handleLogin = useCallback(async (credentials: { email: string, password: string }) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        const response = await fetch(`/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(credentials),
@@ -85,9 +86,16 @@ const App: React.FC = () => {
     }
   }, []);
 
-  const handleRegister = useCallback(async (details: { fullName: string; email: string; password: string }) => {
+  const handleRegister = useCallback(async (details: { 
+    fullName: string; 
+    email: string; 
+    password: string;
+    role: UserRole;
+    phone?: string;
+    location?: string;
+  }) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+        const response = await fetch(`/api/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(details),
@@ -110,6 +118,27 @@ const App: React.FC = () => {
     setUser(null);
   }, []);
 
+  const handleUpdateProfile = useCallback(async (updatedUser: Partial<User>) => {
+    if (user) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedUser),
+        });
+        if (response.ok) {
+          const updatedUserData: User = await response.json();
+          setUser(updatedUserData);
+        } else {
+          alert('Failed to update profile.');
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        alert('An error occurred while updating the profile.');
+      }
+    }
+  }, [user]);
+
   return (
     <div className="min-h-screen bg-slate-100 font-sans text-slate-800">
       <Header 
@@ -118,6 +147,7 @@ const App: React.FC = () => {
         onSellProduceClick={() => setIsAddingListing(true)}
         onLoginClick={() => setAuthModal('login')}
         onRegisterClick={() => setAuthModal('register')}
+        onProfileClick={() => setIsProfileOpen(true)}
       />
       <main className="container mx-auto p-4 md:p-8 max-w-7xl">
         {isLoading ? (
@@ -142,6 +172,13 @@ const App: React.FC = () => {
           onLogin={handleLogin}
           onRegister={handleRegister}
           onSwitchMode={() => setAuthModal(authModal === 'login' ? 'register' : 'login')}
+        />
+      )}
+      {isProfileOpen && user && (
+        <UserProfile
+          user={user}
+          onClose={() => setIsProfileOpen(false)}
+          onUpdateProfile={handleUpdateProfile}
         />
       )}
       <footer className="text-center p-4 mt-8 text-sm text-slate-500">

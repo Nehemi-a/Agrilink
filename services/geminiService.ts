@@ -3,12 +3,11 @@ import type { ProduceData, MarketAnalysis } from '../types';
 
 // Dynamically set the API host to match the hostname used to access the app.
 // This works for both `localhost` and when accessing via a local network IP on a mobile device.
-const API_HOST = window.location.hostname || 'localhost';
-const API_BASE_URL = `http://${API_HOST}:3001`;
+const API_BASE_URL = '';
 
 export const getMarketAnalysis = async (data: ProduceData): Promise<MarketAnalysis> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/ai/market-analysis`, {
+    const response = await fetch(`/api/ai/market-analysis`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
