@@ -28,7 +28,7 @@ export const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd
     },
   });
   const [price, setPrice] = useState('');
-  
+
   const [analysis, setAnalysis] = useState<MarketAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +37,7 @@ export const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-  
+
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPrice(e.target.value);
   };
@@ -75,20 +75,20 @@ export const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate required fields
     if (!price) {
         alert("Please enter a price for your listing.");
         return;
     }
-    
+
     if (!formData.contactDetails.fullName || !formData.contactDetails.phone) {
         alert("Please fill in your full name and phone number.");
         return;
     }
-    
-    onAddListing({ 
-      ...formData, 
+
+    onAddListing({
+      ...formData,
       pricePerUnit: price,
       images: formData.images?.map(file => file.name) || [], // Convert File objects to filenames for now
     });
@@ -110,7 +110,7 @@ export const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd
               <h3 className="text-lg font-semibold text-slate-800 border-b border-slate-200 pb-2">
                 Produce Details
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Object.entries({cropType: 'Crop Type', quantity: 'Quantity', quality: 'Quality', location: 'Farm Location'}).map(([key, label]) => (
                   <div key={key}>
@@ -119,7 +119,7 @@ export const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd
                       type="text"
                       id={key}
                       name={key}
-                      value={formData[key as keyof ProduceData]}
+                      value={formData[key as keyof Omit<ProduceData, 'images' | 'contactDetails'>]}
                       onChange={handleChange}
                       required
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
@@ -170,16 +170,16 @@ export const AddListingModal: React.FC<AddListingModalProps> = ({ onClose, onAdd
                 </button>
               </div>
             </div>
-            
+
             {error && <p className="text-red-600 text-sm">{error}</p>}
-            
+
             {analysis && (
                 <div className="pt-4 border-t border-slate-200">
                     <h3 className="text-xl font-bold text-emerald-800 mb-2">AI Market Analysis</h3>
                     <AnalysisDisplay analysis={analysis} />
                 </div>
             )}
-            
+
             <div className="pt-6 border-t border-slate-200 flex justify-end gap-4">
                 <button type="button" onClick={onClose} className="px-6 py-2 text-sm font-medium text-slate-700 bg-slate-100 border border-slate-300 rounded-lg hover:bg-slate-200">
                     Cancel

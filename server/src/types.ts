@@ -9,6 +9,7 @@ export interface UserWithPassword {
   role: UserRole;
   phone?: string;
   location?: string;
+  avatar?: string; // Added for profile picture
 }
 
 // This is the user type sent to the client, without the password
@@ -19,6 +20,7 @@ export interface User {
   role: UserRole;
   phone?: string;
   location?: string;
+  avatar?: string; // Added for profile picture
 }
 
 export interface ProduceListing {

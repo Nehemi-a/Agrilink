@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { User, UserRole } from '../types';
 import { PencilIcon } from './icons/PencilIcon';
 import { XIcon } from './icons/XIcon';
@@ -6,7 +6,7 @@ import { XIcon } from './icons/XIcon';
 interface UserProfileProps {
   user: User;
   onClose: () => void;
-  onUpdateProfile: (updatedUser: Partial<User>) => void;
+  onUpdateProfile: (updatedUser: FormData) => void;
 }
 
 export const UserProfile: React.FC<UserProfileProps> = ({ user, onClose, onUpdateProfile }) => {
@@ -16,10 +16,29 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, onClose, onUpdat
     phone: user.phone || '',
     location: user.location || '',
   });
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(user.avatar ? `http://localhost:3001/${user.avatar}` : null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setAvatarFile(file);
+      setAvatarPreview(URL.createObjectURL(file));
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onUpdateProfile(formData);
+    const data = new FormData();
+    data.append('id', user.id);
+    data.append('fullName', formData.fullName);
+    data.append('phone', formData.phone);
+    data.append('location', formData.location);
+    if (avatarFile) {
+      data.append('avatar', avatarFile);
+    }
+    onUpdateProfile(data);
     setIsEditing(false);
   };
 
@@ -29,6 +48,8 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, onClose, onUpdat
       phone: user.phone || '',
       location: user.location || '',
     });
+    setAvatarFile(null);
+    setAvatarPreview(user.avatar ? `http://localhost:3001/${user.avatar}` : null);
     setIsEditing(false);
   };
 
@@ -45,15 +66,6 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, onClose, onUpdat
     }
   };
 
-  const getRoleIcon = (role: UserRole) => {
-    switch (role) {
-      case 'seller': return '🌾';
-      case 'buyer': return '🛒';
-      case 'logistics': return '🚚';
-      default: return '👤';
-    }
-  };
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-30 flex items-center justify-center p-4" aria-modal="true" role="dialog">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md transform transition-all animate-fade-in-up">
@@ -63,15 +75,17 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, onClose, onUpdat
             <XIcon className="h-6 w-6" />
           </button>
         </div>
-        
+
         <div className="p-6">
           {!isEditing ? (
             <div className="space-y-6">
               {/* Profile Header */}
               <div className="text-center">
-                <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-3xl">{getRoleIcon(user.role)}</span>
-                </div>
+                <img
+                  src={avatarPreview || 'https://via.placeholder.com/80'}
+                  alt="Profile"
+                  className="w-20 h-20 bg-emerald-100 rounded-full object-cover mx-auto mb-4"
+                />
                 <h3 className="text-xl font-semibold text-slate-800">{user.fullName}</h3>
                 <p className="text-emerald-600 font-medium">{user.role.charAt(0).toUpperCase() + user.role.slice(1)}</p>
                 <p className="text-sm text-slate-600 mt-2">{getRoleDescription(user.role)}</p>
@@ -83,14 +97,14 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, onClose, onUpdat
                   <span className="text-sm font-medium text-slate-700">Email</span>
                   <span className="text-sm text-slate-600">{user.email}</span>
                 </div>
-                
+
                 {user.phone && (
                   <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                     <span className="text-sm font-medium text-slate-700">Phone</span>
                     <span className="text-sm text-slate-600">{user.phone}</span>
                   </div>
                 )}
-                
+
                 {user.location && (
                   <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                     <span className="text-sm font-medium text-slate-700">Location</span>
@@ -110,6 +124,28 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, onClose, onUpdat
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+               <div className="text-center">
+                <img
+                  src={avatarPreview || 'https://via.placeholder.com/80'}
+                  alt="Profile"
+                  className="w-20 h-20 bg-emerald-100 rounded-full object-cover mx-auto mb-4"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-sm text-emerald-600 hover:underline"
+                >
+                  Change Photo
+                </button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                  accept="image/*"
+                />
+              </div>
+
               <div>
                 <label htmlFor="fullName" className="block text-sm font-medium text-slate-700 mb-1">
                   Full Name
@@ -123,7 +159,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, onClose, onUpdat
                   required
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-1">
                   Phone Number
@@ -137,7 +173,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ user, onClose, onUpdat
                   placeholder="+254 700 123 456"
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="location" className="block text-sm font-medium text-slate-700 mb-1">
                   Location

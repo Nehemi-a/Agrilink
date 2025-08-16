@@ -1,6 +1,6 @@
 import React from 'react';
 import type { ProduceListing } from '../types';
-import { ListingCard } from './ListingCard';
+import ListingCard from './ListingCard';
 
 interface MarketplaceProps {
   listings: ProduceListing[];

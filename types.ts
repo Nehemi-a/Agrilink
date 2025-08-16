@@ -1,4 +1,3 @@
-
 export type UserRole = 'seller' | 'buyer' | 'logistics';
 
 export interface ProduceData {
@@ -34,6 +33,7 @@ export interface User {
   role: UserRole;
   phone?: string;
   location?: string;
+  avatar?: string; // Added for profile picture
 }
 
 export interface ProduceListing {
@@ -44,7 +44,7 @@ export interface ProduceListing {
   quality: string;
   location: string;
   pricePerUnit: string;
-  images?: string[]; // URLs to uploaded images
+  images?: string[];
   contactDetails: {
     fullName: string;
     phone: string;

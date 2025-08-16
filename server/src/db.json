@@ -1,22 +1,13 @@
 {
   "users": [
     {
-      "id": "1755334711343",
+      "id": "1755344268008",
       "fullName": "Nehemia Bett",
       "email": "nehemiahn44@gmail.com",
-      "password": "12345678",
-      "role": "buyer",
-      "phone": "0706117300",
-      "location": "Bomet"
-    },
-    {
-      "id": "1755334848808",
-      "fullName": "joash kemboi",
-      "email": "mwangipeter4@gmail.com",
-      "password": "123456",
-      "role": "seller",
-      "phone": "0113453497",
-      "location": "Bomet"
+      "password": "1234567",
+      "role": "logistics",
+      "phone": "0706117309",
+      "location": "Narok"
     }
   ],
   "listings": [

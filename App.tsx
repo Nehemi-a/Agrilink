@@ -7,8 +7,6 @@ import { AddListingModal } from './components/AddListingModal';
 import { AuthModal } from './components/AuthModal';
 import { UserProfile } from './components/UserProfile';
 
-// Dynamically set the API host to match the hostname used to access the app.
-// This works for both `localhost` and when accessing via a local network IP on a mobile device.
 const API_BASE_URL = '';
 
 const App: React.FC = () => {
@@ -117,17 +115,18 @@ const App: React.FC = () => {
     setUser(null);
   }, []);
 
-  const handleUpdateProfile = useCallback(async (updatedUser: Partial<User>) => {
+  const handleUpdateProfile = useCallback(async (updatedUser: FormData) => {
     if (user) {
       try {
         const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updatedUser),
+          body: updatedUser,
         });
         if (response.ok) {
           const updatedUserData: User = await response.json();
           setUser(updatedUserData);
+          setIsProfileOpen(false);
+          alert('Your profile has been updated successfully!');
         } else {
           alert('Failed to update profile.');
         }
