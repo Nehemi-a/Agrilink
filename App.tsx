@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import type { User, ProduceListing, UserRole } from './types';
 import { getMarketAnalysis } from './services/geminiService';
@@ -86,9 +85,9 @@ const App: React.FC = () => {
     }
   }, []);
 
-  const handleRegister = useCallback(async (details: { 
-    fullName: string; 
-    email: string; 
+  const handleRegister = useCallback(async (details: {
+    fullName: string;
+    email: string;
     password: string;
     role: UserRole;
     phone?: string;
@@ -141,9 +140,9 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-100 font-sans text-slate-800">
-      <Header 
-        user={user} 
-        onLogout={handleLogout} 
+      <Header
+        user={user}
+        onLogout={handleLogout}
         onSellProduceClick={() => setIsAddingListing(true)}
         onLoginClick={() => setAuthModal('login')}
         onRegisterClick={() => setAuthModal('register')}

@@ -1,0 +1,79 @@
+{
+  "users": [
+    {
+      "id": "1755334711343",
+      "fullName": "Nehemia Bett",
+      "email": "nehemiahn44@gmail.com",
+      "password": "12345678",
+      "role": "buyer",
+      "phone": "0706117300",
+      "location": "Bomet"
+    },
+    {
+      "id": "1755334848808",
+      "fullName": "joash kemboi",
+      "email": "mwangipeter4@gmail.com",
+      "password": "123456",
+      "role": "seller",
+      "phone": "0113453497",
+      "location": "Bomet"
+    }
+  ],
+  "listings": [
+    {
+      "id": "1",
+      "sellerName": "Jelani Farm",
+      "cropType": "Ruiru 11 Coffee",
+      "quantity": "500 kg",
+      "quality": "Grade AA",
+      "location": "Kiambu County",
+      "pricePerUnit": "KES 750 per kg",
+      "images": [
+        "coffee1.jpg",
+        "coffee2.jpg"
+      ],
+      "contactDetails": {
+        "fullName": "Jelani Kamau",
+        "phone": "+254 700 123 456",
+        "email": "jelani@farm.com",
+        "whatsapp": "+254 700 123 456"
+      }
+    },
+    {
+      "id": "2",
+      "sellerName": "Amani Growers",
+      "cropType": "Hass Avocado",
+      "quantity": "2 tons",
+      "quality": "Export Grade",
+      "location": "Muranga County",
+      "pricePerUnit": "KES 80 per kg",
+      "images": [
+        "avocado1.jpg"
+      ],
+      "contactDetails": {
+        "fullName": "Amani Wachira",
+        "phone": "+254 700 234 567",
+        "email": "amani@growers.com"
+      }
+    },
+    {
+      "id": "3",
+      "sellerName": "Pwani Produce",
+      "cropType": "Cashew Nuts",
+      "quantity": "1.5 tons",
+      "quality": "Jumbo",
+      "location": "Kilifi County",
+      "pricePerUnit": "KES 120 per kg",
+      "images": [
+        "cashew1.jpg",
+        "cashew2.jpg",
+        "cashew3.jpg"
+      ],
+      "contactDetails": {
+        "fullName": "Pwani Mwangi",
+        "phone": "+254 700 345 678",
+        "whatsapp": "+254 700 345 678"
+      }
+    }
+  ]
+}
